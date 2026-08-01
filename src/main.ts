@@ -39,31 +39,29 @@ key.position.set(3, 4, 2);
 scene.add(key);
 
 // ---------- TSL ----------
-const uAmp = uniform(0);
-const uFreq = uniform(0);
-const uSpeed = uniform(0);
+const uAmp = uniform(1);
+const uFreq = uniform(2);
+const uSpeed = uniform(1.0);
 const uMouse = uniform(vec2(0, 0));
 const uColorA = uniform(new THREE.Color("#12224a"));
 const uColorB = uniform(new THREE.Color("#ff5f1f"));
 
 // Fn() = função de shader reutilizável. Isso é o coração do TSL.
 const noise = Fn(() => {
-  const p = positionLocal.mul(uFreq).add(time.mul(uSpeed));
+  const p = positionLocal.mul(uFreq).add(time.div(5).mul(uSpeed));
   return mx_noise_float(p); // -1 .. 1
 });
 
 const n = noise();
 
 // desloca o vértice ao longo da normal
-material_position: {
-}
 const material = new THREE.MeshStandardNodeMaterial({
   roughness: 0.3,
   metalness: 0.4,
 });
 
 material.positionNode = positionLocal.add(
-  normalLocal.mul(n.mul(uAmp).mul(uMouse.x.mul(0.5).add(1))),
+  normalLocal.mul(n.mul(uAmp).mul(uMouse.x.add(1))),
 );
 material.colorNode = mix(uColorA, uColorB, n.mul(0.5).add(0.5));
 
