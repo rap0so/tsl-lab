@@ -1,3 +1,4 @@
+import lilgui from "lil-gui";
 import * as THREE from "three/webgpu";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
@@ -11,6 +12,8 @@ import {
   vec2,
   abs,
 } from "three/tsl";
+
+const gui = new lilgui();
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#08080c");
@@ -39,6 +42,7 @@ const key = new THREE.DirectionalLight(0xffffff, 3);
 key.position.set(3, 4, 2);
 scene.add(key);
 
+const guiFolder = gui.addFolder("crazy-ball 🪩");
 // ---------- TSL ----------
 const uAmp = uniform(1);
 const uFreq = uniform(2);
@@ -46,6 +50,12 @@ const uSpeed = uniform(1.0);
 const uMouse = uniform(vec2(0, 0));
 const uColorA = uniform(new THREE.Color("#12224a"));
 const uColorB = uniform(new THREE.Color("#ff5f1f"));
+
+// ------- GUI --------
+guiFolder.add(uAmp, "value", 0, 2, 0.5).name("Amplification");
+guiFolder.add(uFreq, "value", 0, 3, 0.25).name("Frequency");
+guiFolder.addColor(uColorB, "value").name("Main color");
+guiFolder.addColor(uColorA, "value").name("Secondary color");
 
 // Fn() = função de shader reutilizável. Isso é o coração do TSL.
 const noise = Fn(() => {
