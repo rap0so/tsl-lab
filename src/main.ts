@@ -9,6 +9,7 @@ import {
   normalLocal,
   mx_noise_float,
   vec2,
+  abs,
 } from "three/tsl";
 
 const scene = new THREE.Scene();
@@ -61,7 +62,8 @@ const material = new THREE.MeshStandardNodeMaterial({
 });
 
 material.positionNode = positionLocal.add(
-  normalLocal.mul(n.mul(uAmp).mul(uMouse.x.add(1))),
+  normalLocal.mul(n.mul(uAmp).mul(abs(uMouse.x))),
+  normalLocal.mul(n.mul(uAmp).mul(abs(uMouse.y))),
 );
 material.colorNode = mix(uColorA, uColorB, n.mul(0.5).add(0.5));
 
