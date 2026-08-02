@@ -52,8 +52,8 @@ const uColorA = uniform(new THREE.Color("#12224a"));
 const uColorB = uniform(new THREE.Color("#ff5f1f"));
 
 // ------- GUI --------
-guiFolder.add(uAmp, "value", 0, 2, 0.5).name("Amplification");
-guiFolder.add(uFreq, "value", 0, 3, 0.25).name("Frequency");
+guiFolder.add(uAmp, "value", 0, 2, 0.01).name("Amplification");
+guiFolder.add(uFreq, "value", 0, 3, 0.05).name("Frequency");
 guiFolder.addColor(uColorB, "value").name("Main color");
 guiFolder.addColor(uColorA, "value").name("Secondary color");
 
