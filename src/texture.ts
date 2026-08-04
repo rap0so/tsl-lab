@@ -21,7 +21,7 @@ import {
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#08080c");
-const texturePath = "public/textures/gray-rocks/gray_rocks_diff_1k.png";
+const texturePath = "/textures/gray-rocks/gray_rocks_diff_1k.png";
 
 // --------------- CAMERA ---------------
 const camera = new THREE.PerspectiveCamera(
