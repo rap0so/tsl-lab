@@ -14,11 +14,8 @@ import {
   float,
   cross,
   mul,
-  TWO_PI,
-  cos,
   add,
   texture,
-  uv,
   div,
 } from "three/tsl";
 
