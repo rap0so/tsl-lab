@@ -19,11 +19,10 @@ import {
   add,
 } from "three/tsl";
 
-const gui = new lilgui();
-
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#08080c");
 
+// --------------- CAMERA ---------------
 const camera = new THREE.PerspectiveCamera(
   45,
   innerWidth / innerHeight,
@@ -37,7 +36,7 @@ renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 document.body.appendChild(renderer.domElement);
 
-// OBRIGATÓRIO — sem isso não renderiza e falha em silêncio
+// -------------------- INIT --------------------
 await renderer.init();
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -48,18 +47,19 @@ const key = new THREE.DirectionalLight(0xffffff, 3);
 key.position.set(3, 4, 2);
 scene.add(key);
 
-const guiFolder = gui.addFolder("Crazy Ball 🪩");
 // ---------- TSL ----------
 const uAmp = uniform(1);
 const uFreq = uniform(2);
 const uSpeed = uniform(1.0);
 const uMouse = uniform(vec2(0, 0));
 
-// ------- GUI --------
+// -------------- GUI ---------------
+const gui = new lilgui();
+const guiFolder = gui.addFolder("Crazy Ball 🪩");
 guiFolder.add(uAmp, "value", 0, 2, 0.01).name("Amplification");
 guiFolder.add(uFreq, "value", 0, 3, 0.05).name("Frequency");
 
-// ------ Noise --------
+// --------------- Noise -----------------
 const noise = Fn(([newPosition]: [THREE.Node<"vec3">]) => {
   const p = newPosition.mul(uFreq).add(time.div(5).mul(uSpeed));
   return mx_noise_float(p); // -1 .. 1
@@ -75,7 +75,7 @@ const displacePosition = Fn(
   },
 );
 
-// Cosine Palette
+// -------- Cosine Palette--------
 type CosinePalette = [
   THREE.Node<"float">,
   THREE.Node<"vec3">,
