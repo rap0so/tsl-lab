@@ -5,7 +5,6 @@ import {
   Fn,
   uniform,
   positionLocal,
-  vec2,
   mul,
   add,
   vec3,
@@ -48,7 +47,6 @@ scene.add(key);
 
 // ---------- TSL ----------
 const uAmp = uniform(1);
-const uMouse = uniform(vec2(0, 0));
 
 // -------------- GUI ---------------
 const gui = new lilgui();
@@ -164,13 +162,6 @@ const mesh = new THREE.InstancedMesh(
 );
 scene.add(mesh);
 // -------------------------
-
-addEventListener("pointermove", (e) => {
-  uMouse.value.set(
-    (e.clientX / innerWidth) * 2 - 1,
-    -((e.clientY / innerHeight) * 2 - 1),
-  );
-});
 
 addEventListener("resize", () => {
   camera.aspect = innerWidth / innerHeight;

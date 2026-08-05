@@ -8,6 +8,7 @@ export default defineConfig({
         main: resolve(import.meta.dirname, "index.html"),
         texture: resolve(import.meta.dirname, "texture.html"),
         instancing: resolve(import.meta.dirname, "instancing.html"),
+        storageBuffer: resolve(import.meta.dirname, "storage-buffer.html"),
       },
     },
   },
