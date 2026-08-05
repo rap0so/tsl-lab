@@ -117,7 +117,7 @@ const material = new THREE.MeshStandardNodeMaterial({
   roughness: 0.1,
   metalness: 0.8,
 });
-
+//  ----------- Color ------------------
 const uColorBase = uniform(new THREE.Color("#bdc3cf"));
 const uColorFreq = uniform(new THREE.Color("#04c7f3"));
 const uColorAmp = uniform(new THREE.Color("#000"));
@@ -145,6 +145,8 @@ const dFolder = paletteFolder.addFolder("Phase (d)");
 dFolder.add(uColorPhase.value, "r", 0, 1, 0.01).name("R");
 dFolder.add(uColorPhase.value, "g", 0, 1, 0.01).name("G");
 dFolder.add(uColorPhase.value, "b", 0, 1, 0.01).name("B");
+
+//  -------------------
 
 const positionalLocalNoise = noise(positionLocal);
 const colorRuler = positionalLocalNoise.mul(0.5).add(0.5);
