@@ -4,22 +4,13 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   Fn,
   uniform,
-  time,
   positionLocal,
-  normalLocal,
-  mx_noise_float,
   vec2,
-  abs,
   vec3,
-  float,
-  cross,
-  mul,
-  TWO_PI,
-  cos,
-  add,
   instancedArray,
-  storage,
   instanceIndex,
+  hash,
+  vec4,
 } from "three/tsl";
 
 const scene = new THREE.Scene();
@@ -64,15 +55,35 @@ guiFolder.add(uFreq, "value", 0, 3, 0.05).name("Frequency");
 // --------- Actions -----------
 
 const countParticles = 262144;
-const dataBuffer = instancedArray(countParticles, "float");
-// console.log(dataBuffer);
+const velocityBuffer = instancedArray(countParticles, "vec3");
+const positionBuffer = instancedArray(countParticles, "vec3");
+
+const initParticles = Fn(() => {
+  const position = positionBuffer.element(instanceIndex);
+  const rX = hash(instanceIndex);
+  const rY = hash(instanceIndex.add(1));
+  const rZ = hash(instanceIndex.add(2));
+  // .sub(0.5) para andar para o centro e .mul(10) para criar um volume
+  const rPositionVec = vec3(rX, rY, rZ).sub(0.5).mul(10);
+  position.assign(rPositionVec);
+
+  const velocity = velocityBuffer.element(instanceIndex);
+  const vX = hash(instanceIndex.add(3));
+  const vY = hash(instanceIndex.add(4));
+  const vZ = hash(instanceIndex.add(5));
+  const rVelocityVec = vec3(vX, vY, vZ).sub(0.5).mul(0.02);
+
+  velocity.assign(rVelocityVec);
+})().compute(countParticles);
+await renderer.computeAsync(initParticles);
 
 const updateParticles = Fn(() => {
   /**
    * Isso é um
    * const data = dataBuffer[instanceIndex]
    */
-  const data = dataBuffer.element(instanceIndex);
+  const velocity = velocityBuffer.element(instanceIndex);
+  const position = positionBuffer.element(instanceIndex);
   /**
    * Isso é um
    * data = Math.float(index) * 2
@@ -82,31 +93,27 @@ const updateParticles = Fn(() => {
     seria o mesmo que 
   * data += Math.float(index) * 2
    */
-  data.assign(float(instanceIndex).mul(2));
+  position.addAssign(velocity);
 })().compute(countParticles);
 
-// Rendering
-await renderer.computeAsync(updateParticles);
-
-// Getting the value that got rendered
-const arrayBuffer = await renderer.getArrayBufferAsync(dataBuffer.value);
-
-// Transforming the array back to JS
-const result = new Float32Array(arrayBuffer);
-console.log(result);
-
 // ------- Material ------
-const material = new THREE.MeshStandardMaterial({
+const material = new THREE.MeshStandardNodeMaterial({
   roughness: 0.1,
   metalness: 0.8,
-  wireframe: true,
+  //   side
 });
 
-// material.positionNode = ;
+material.positionNode = positionLocal.add(
+  positionBuffer.element(instanceIndex),
+);
 // material.normalNode =
-// material.colorNode = ;
+material.colorNode = vec4(1.0, 1.0, 1.0, 1.0);
 
-const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+const mesh = new THREE.InstancedMesh(
+  new THREE.PlaneGeometry(1, 1),
+  material,
+  countParticles,
+);
 scene.add(mesh);
 // -------------------------
 
@@ -125,5 +132,6 @@ addEventListener("resize", () => {
 
 renderer.setAnimationLoop(() => {
   controls.update();
+  renderer.computeAsync(updateParticles);
   renderer.render(scene, camera);
 });
