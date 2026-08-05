@@ -82,7 +82,7 @@ const updateParticles = Fn(() => {
     seria o mesmo que 
   * data += Math.float(index) * 2
    */
-  data.assign(instanceIndex);
+  data.assign(float(instanceIndex).mul(2));
 })().compute(countParticles);
 
 // Rendering
