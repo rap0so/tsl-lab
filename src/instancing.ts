@@ -5,13 +5,9 @@ import {
   Fn,
   uniform,
   positionLocal,
-  normalLocal,
   vec2,
-  abs,
   mul,
   add,
-  texture,
-  div,
   vec3,
   instanceIndex,
   hash,
@@ -52,22 +48,12 @@ scene.add(key);
 
 // ---------- TSL ----------
 const uAmp = uniform(1);
-// const uFreq = uniform(2);
-// const uSpeed = uniform(1.0);
 const uMouse = uniform(vec2(0, 0));
 
 // -------------- GUI ---------------
 const gui = new lilgui();
 const guiFolder = gui.addFolder("Crazy Ball 🪩");
 guiFolder.add(uAmp, "value", 0, 2, 0.01).name("Amplification");
-
-// --------------- Noise -----------------
-// const noise = Fn(([newPosition]: [THREE.Node<"vec3">]) => {
-//   const p = newPosition.mul(uFreq).add(time.div(5).mul(uSpeed));
-//   return mx_noise_float(p); // -1 .. 1
-// });
-
-//  ----- Position Node --------
 
 //  ------- Normal Mode ------------
 
@@ -82,35 +68,6 @@ const textureLoader = new THREE.TextureLoader();
 const textureRock = textureLoader.load(texturePath);
 textureRock.wrapS = THREE.RepeatWrapping;
 textureRock.wrapT = THREE.RepeatWrapping;
-
-/**
- * Aqi estamos pegando a projeção da skin de angulos diferentes
- * tem que ser frente, cima e lado
- * como 3 projetores de filme apontando para a esfera
- */
-const textureUp = texture(textureRock, positionLocal.xz);
-const textureFront = texture(textureRock, positionLocal.xy);
-const textureSide = texture(textureRock, positionLocal.yz);
-
-/**
- * A normal decide quem vai ganhar dessas 3 textures aí
- * se tiver vendo de cima, de lado, ou de frente
- */
-const textureRulerFront = abs(normalLocal.z);
-const textureRulerUp = abs(normalLocal.y);
-const textureRulerSide = abs(normalLocal.x);
-
-/**
- * Agora tiramos a media de tudo
- */
-
-const rulerKing = add(textureRulerFront, textureRulerUp, textureRulerSide);
-const textureKing = add(
-  mul(textureUp, textureRulerUp),
-  mul(textureFront, textureRulerFront),
-  mul(textureSide, textureRulerSide),
-);
-const theFinalKing = div(textureKing, rulerKing);
 
 // --------------- SETUP MATERIAL ---------------
 
