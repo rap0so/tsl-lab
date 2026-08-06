@@ -1,4 +1,3 @@
-import lilgui from "lil-gui";
 import * as THREE from "three/webgpu";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
@@ -18,7 +17,6 @@ import {
   mx_noise_float,
   float,
   cross,
-  rotate,
   rotateUV,
 } from "three/tsl";
 
@@ -27,15 +25,13 @@ scene.background = new THREE.Color("#08080c");
 const texturePath = "/textures/newspaper/crumpled-newspaper-24845376.webp";
 
 // -------------- GUI ---------------
-const gui = new lilgui();
-const guiFolder = gui.addFolder("Crazy Ball 🪩");
 
 // --------------- CAMERA ---------------
 const camera = new THREE.PerspectiveCamera(
-  45,
+  100,
   innerWidth / innerHeight,
   0.1,
-  100,
+  5000,
 );
 camera.position.set(0, 0, 15);
 
@@ -58,13 +54,11 @@ scene.add(key);
 const uAmp = uniform(1);
 const uFreq = uniform(2);
 const uMouse = uniform(vec2(0, 0));
-guiFolder.add(uAmp, "value", 0, 2, 0.01).name("Amplification");
-guiFolder.add(uFreq, "value", 0, 3, 0.05).name("Frequency");
 
 // --------- Actions -----------
 
 // --------------- Paper generator ------------------
-const countPaper = 262144;
+const countPaper = 269994;
 const velocityBuffer = instancedArray(countPaper, "vec3");
 const rotationBuffer = instancedArray(countPaper, "float");
 const positionBuffer = instancedArray(countPaper, "vec3");
@@ -74,8 +68,7 @@ const initParticles = Fn(() => {
   const rX = hash(instanceIndex);
   const rY = hash(instanceIndex.add(1));
   const rZ = hash(instanceIndex.add(2));
-  // .sub(0.5) para andar para o centro e .mul(10) para criar um volume
-  const rPositionVec = vec3(rX, rY, rZ).sub(0.5).mul(10);
+  const rPositionVec = vec3(rX, rY, rZ).sub(0.5).mul(200);
   position.assign(rPositionVec);
 
   const velocity = velocityBuffer.element(instanceIndex);
@@ -94,8 +87,12 @@ const updateParticles = Fn(() => {
   const velocity = velocityBuffer.element(instanceIndex);
   const position = positionBuffer.element(instanceIndex);
 
-  velocity.assign(curlNoise(position).mul(0.1));
-  position.addAssign(velocity);
+  const curlItself = curlNoise(position).mul(0.05);
+  const curlAroundTheMainSwirld = swirl(position).mul(0.5);
+
+  const pullToCenter = position.negate().normalize().mul(0.005);
+  velocity.assign(add(curlItself, curlAroundTheMainSwirld, pullToCenter));
+  position.addAssign(velocity.mul(5));
 
   const rotation = rotationBuffer.element(instanceIndex);
   const angularSpeed = float(hash(instanceIndex.add(3)).div(30));
@@ -164,7 +161,6 @@ const cosinePalette = Fn(([t, a, b, c, d]: CosinePalette) => {
 
 //  ----------- Color ------------------
 const uColorFreq = uniform(new THREE.Color("#04c7f3"));
-const uColorAmp = uniform(new THREE.Color("#000"));
 const uColorPhase = uniform(new THREE.Color("#0d0400"));
 
 const rColor = hash(instanceIndex.add(3));
