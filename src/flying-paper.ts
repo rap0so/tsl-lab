@@ -10,15 +10,22 @@ import {
   instancedArray,
   instanceIndex,
   hash,
-  vec4,
   add,
   mul,
   cos,
   TWO_PI,
+  texture,
+  mx_noise_float,
+  float,
 } from "three/tsl";
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#08080c");
+const texturePath = "/textures/newspaper/crumpled-newspaper-24845376.webp";
+
+// -------------- GUI ---------------
+const gui = new lilgui();
+const guiFolder = gui.addFolder("Crazy Ball 🪩");
 
 // --------------- CAMERA ---------------
 const camera = new THREE.PerspectiveCamera(
@@ -27,7 +34,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100,
 );
-camera.position.set(0, 0, 4);
+camera.position.set(0, 0, 15);
 
 const renderer = new THREE.WebGPURenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
@@ -48,18 +55,15 @@ scene.add(key);
 const uAmp = uniform(1);
 const uFreq = uniform(2);
 const uMouse = uniform(vec2(0, 0));
-
-// -------------- GUI ---------------
-const gui = new lilgui();
-const guiFolder = gui.addFolder("Crazy Ball 🪩");
 guiFolder.add(uAmp, "value", 0, 2, 0.01).name("Amplification");
 guiFolder.add(uFreq, "value", 0, 3, 0.05).name("Frequency");
 
 // --------- Actions -----------
 
-const countParticles = 262144;
-const velocityBuffer = instancedArray(countParticles, "vec3");
-const positionBuffer = instancedArray(countParticles, "vec3");
+// --------------- Paper generator ------------------
+const countPaper = 262144;
+const velocityBuffer = instancedArray(countPaper, "vec3");
+const positionBuffer = instancedArray(countPaper, "vec3");
 
 const initParticles = Fn(() => {
   const position = positionBuffer.element(instanceIndex);
@@ -77,27 +81,54 @@ const initParticles = Fn(() => {
   const rVelocityVec = vec3(vX, vY, vZ).sub(0.5).mul(0.02);
 
   velocity.assign(rVelocityVec);
-})().compute(countParticles);
+})().compute(countPaper);
 await renderer.computeAsync(initParticles);
 
+// --------------- Paper move ------------------
+
 const updateParticles = Fn(() => {
-  /**
-   * Isso é um
-   * const data = dataBuffer[instanceIndex]
-   */
   const velocity = velocityBuffer.element(instanceIndex);
   const position = positionBuffer.element(instanceIndex);
-  /**
-   * Isso é um
-   * data = Math.float(index) * 2
-   * 
-   * Um
-    data.addAssign 
-    seria o mesmo que 
-  * data += Math.float(index) * 2
-   */
+
+  velocity.assign(curlNoise(position).mul(0.02));
   position.addAssign(velocity);
-})().compute(countParticles);
+})().compute(countPaper);
+
+// ------------ Curl Papers --------------------
+
+const potential = Fn(([pos]: [THREE.Node<"vec3">]) => {
+  const xHash = pos.add(vec3(37.0, 17.0, 91.0));
+  const x = mx_noise_float(xHash);
+
+  const yHash = pos.add(vec3(11.0, 53.0, 71.0)),
+    y = mx_noise_float(yHash);
+
+  const zHash = pos.add(vec3(23.0, 61.0, 6.0)),
+    z = mx_noise_float(zHash);
+
+  return vec3(x, y, z);
+});
+
+const curlNoise = Fn(([pos]: [THREE.Node<"vec3">]) => {
+  const smallStep = float(0.01); // a.k.a eps
+
+  const px0 = potential(pos.sub(vec3(smallStep, 0, 0))),
+    px1 = potential(pos.add(vec3(smallStep, 0, 0)));
+
+  const py0 = potential(pos.sub(vec3(0, smallStep, 0))),
+    py1 = potential(pos.add(vec3(0, smallStep, 0)));
+
+  const pz0 = potential(pos.sub(vec3(0, 0, smallStep))),
+    pz1 = potential(pos.add(vec3(0, 0, smallStep)));
+
+  const x = py1.z.sub(py0.z).sub(pz1.y.sub(pz0.y));
+  const y = pz1.x.sub(pz0.x).sub(px1.z.sub(px0.z));
+  const z = px1.y.sub(px0.y).sub(py1.x.sub(py0.x));
+
+  return vec3(x, y, z)
+    .mul(float(1.0).div(float(2).mul(smallStep)))
+    .normalize();
+});
 
 // -------- Cosine Palette--------
 type CosinePalette = [
@@ -115,7 +146,6 @@ const cosinePalette = Fn(([t, a, b, c, d]: CosinePalette) => {
 });
 
 //  ----------- Color ------------------
-const uColorBase = uniform(new THREE.Color("#bdc3cf"));
 const uColorFreq = uniform(new THREE.Color("#04c7f3"));
 const uColorAmp = uniform(new THREE.Color("#000"));
 const uColorPhase = uniform(new THREE.Color("#0d0400"));
@@ -124,31 +154,40 @@ const rColor = hash(instanceIndex.add(3));
 
 const colorNode = cosinePalette(
   rColor,
-  uColorBase.rgb,
+  vec3(
+    hash(instanceIndex),
+    hash(instanceIndex.add(2)),
+    hash(instanceIndex.add(4)),
+  ),
   uColorAmp.rgb,
   uColorFreq.rgb,
   uColorPhase.rgb,
 );
 
+// --------------- TEXTURE LOADER ---------------
+
+const textureLoader = new THREE.TextureLoader();
+const texturePaper = textureLoader.load(texturePath);
+texturePaper.wrapS = THREE.RepeatWrapping;
+texturePaper.wrapT = THREE.RepeatWrapping;
+
 // ------- Material ------
 const material = new THREE.MeshStandardNodeMaterial({
-  roughness: 0.1,
-  metalness: 0.8,
-  //   side
+  side: THREE.DoubleSide,
 });
 
 material.positionNode = positionLocal.add(
   positionBuffer.element(instanceIndex),
 );
-// material.normalNode =
-material.colorNode = vec4(1.0, 1.0, 1.0, 1.0);
+material.colorNode = texture(texturePaper).mul(colorNode);
 
 const mesh = new THREE.InstancedMesh(
   new THREE.PlaneGeometry(1, 1),
   material,
-  countParticles,
+  countPaper,
 );
 scene.add(mesh);
+
 // -------------------------
 
 await renderer.init();
@@ -168,6 +207,6 @@ window.addEventListener("resize", () => {
 
 renderer.setAnimationLoop(() => {
   controls.update();
-  // renderer.computeAsync(updateParticles);
+  renderer.computeAsync(updateParticles);
   renderer.render(scene, camera);
 });
