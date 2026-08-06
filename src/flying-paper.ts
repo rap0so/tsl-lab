@@ -49,7 +49,7 @@ document.body.appendChild(renderer.domElement);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+scene.add(new THREE.AmbientLight(0xffffff, 0.7));
 const key = new THREE.DirectionalLight(0xffffff, 3);
 key.position.set(3, 4, 2);
 scene.add(key);
@@ -94,7 +94,7 @@ const updateParticles = Fn(() => {
   const velocity = velocityBuffer.element(instanceIndex);
   const position = positionBuffer.element(instanceIndex);
 
-  velocity.assign(curlNoise(position).mul(0.02));
+  velocity.assign(curlNoise(position).mul(0.1));
   position.addAssign(velocity);
 
   const rotation = rotationBuffer.element(instanceIndex);
@@ -109,10 +109,10 @@ const potential = Fn(([pos]: [THREE.Node<"vec3">]) => {
   const xHash = pos.add(vec3(37.0, 17.0, 91.0));
   const x = mx_noise_float(xHash);
 
-  const yHash = pos.add(vec3(11.0, 53.0, 71.0)),
+  const yHash = pos.add(vec3(1, 53.0, 71.0)),
     y = mx_noise_float(yHash);
 
-  const zHash = pos.add(vec3(23.0, 61.0, 6.0)),
+  const zHash = pos.add(vec3(23.0, 61.0, 80.0)),
     z = mx_noise_float(zHash);
 
   return vec3(x, y, z);
@@ -176,7 +176,11 @@ const colorNode = cosinePalette(
     hash(instanceIndex.add(2)),
     hash(instanceIndex.add(4)),
   ),
-  uColorAmp.rgb,
+  vec3(
+    hash(instanceIndex),
+    hash(instanceIndex.add(instanceIndex)),
+    hash(instanceIndex.add(instanceIndex)),
+  ),
   uColorFreq.rgb,
   uColorPhase.rgb,
 );
