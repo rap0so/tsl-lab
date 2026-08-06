@@ -51,8 +51,6 @@ key.position.set(3, 4, 2);
 scene.add(key);
 
 // ---------- TSL ----------
-const uAmp = uniform(1);
-const uFreq = uniform(2);
 const uMouse = uniform(vec2(0, 0));
 
 // --------- Actions -----------
