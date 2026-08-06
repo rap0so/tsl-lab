@@ -17,6 +17,9 @@ import {
   texture,
   mx_noise_float,
   float,
+  cross,
+  rotate,
+  rotateUV,
 } from "three/tsl";
 
 const scene = new THREE.Scene();
@@ -63,6 +66,7 @@ guiFolder.add(uFreq, "value", 0, 3, 0.05).name("Frequency");
 // --------------- Paper generator ------------------
 const countPaper = 262144;
 const velocityBuffer = instancedArray(countPaper, "vec3");
+const rotationBuffer = instancedArray(countPaper, "float");
 const positionBuffer = instancedArray(countPaper, "vec3");
 
 const initParticles = Fn(() => {
@@ -92,6 +96,11 @@ const updateParticles = Fn(() => {
 
   velocity.assign(curlNoise(position).mul(0.02));
   position.addAssign(velocity);
+
+  const rotation = rotationBuffer.element(instanceIndex);
+  const angularSpeed = float(hash(instanceIndex.add(3)).div(30));
+
+  rotation.addAssign(angularSpeed);
 })().compute(countPaper);
 
 // ------------ Curl Papers --------------------
@@ -128,6 +137,14 @@ const curlNoise = Fn(([pos]: [THREE.Node<"vec3">]) => {
   return vec3(x, y, z)
     .mul(float(1.0).div(float(2).mul(smallStep)))
     .normalize();
+});
+
+//  -------------------- Swirl --------------------
+const swirl = Fn(([pos]: [THREE.Node<"vec3">]) => {
+  const axis = vec3(0, 1, 0); // roda em Y
+
+  const tangent = cross(axis, pos).normalize();
+  return tangent;
 });
 
 // -------- Cosine Palette--------
@@ -176,9 +193,10 @@ const material = new THREE.MeshStandardNodeMaterial({
   side: THREE.DoubleSide,
 });
 
-material.positionNode = positionLocal.add(
-  positionBuffer.element(instanceIndex),
-);
+material.positionNode = rotateUV(
+  positionLocal,
+  rotationBuffer.element(instanceIndex),
+).add(positionBuffer.element(instanceIndex));
 material.colorNode = texture(texturePaper).mul(colorNode);
 
 const mesh = new THREE.InstancedMesh(
