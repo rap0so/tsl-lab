@@ -27,9 +27,11 @@ const texturePath = "/textures/newspaper/crumpled-newspaper-24845376.webp";
 // -------------- GUI ---------------
 const gui = new lilgui();
 const uMouseStrength = uniform(0.03);
+const uMouseAttraction = uniform(true);
 const uPaperSpeed = uniform(1.0);
 
-gui.add(uMouseStrength, "value", 0, 1, 0.001).name("Mouse");
+gui.add(uMouseStrength, "value", 0, 1, 0.001).name("Mouse Power");
+gui.add(uMouseAttraction, "value").name("Mouse Attraction");
 gui.add(uPaperSpeed, "value", 1, 100, 1).name("Paper speed");
 
 // --------------- CAMERA ---------------
@@ -88,8 +90,11 @@ const updateParticles = Fn(() => {
   const toMouse = mouseWorldPos.sub(position);
   const distToMouse = length(toMouse).add(1); // to avoid 0
 
-  const mouseForce = toMouse
-    .normalize() // ql direção
+  const direction = uMouseAttraction.select(float(1), float(-1));
+
+  let mouseForce = toMouse
+    .normalize() // ql direção, nao a força
+    .mul(direction)
     .mul(uMouseStrength)
     .div(distToMouse);
 
