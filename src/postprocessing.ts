@@ -5,7 +5,8 @@ console.log(
 import * as THREE from "three/webgpu";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { uniform } from "three/tsl";
+import { Fn, length, pass, smoothstep, uv } from "three/tsl";
+import { RenderPipeline } from "three/webgpu";
 import lilgui from "lil-gui";
 import Stats from "stats-gl";
 
@@ -24,12 +25,33 @@ const camera = new THREE.PerspectiveCamera(
 );
 camera.position.set(0, 0, 3.2);
 
+//   -------------------- RENDERER --------------------
 const renderer = new THREE.WebGPURenderer({ antialias: true });
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Deixa a sombra mais suave
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 document.body.appendChild(renderer.domElement);
+await renderer.init();
+
+//  ------------------------ VIGNETTE ------------------------
+const vignette = Fn(() => {
+  /**
+   * uv é a coordenada da tela inteira
+   * sub(.5) centraliza
+   * length() dá a distancia radial
+   */
+  const dist = length(uv().sub(0.5));
+  const vig = smoothstep(0.8, 0.2, dist); // 1 no centro, 0 nas bordas
+  return vig;
+});
+
+//  -------------- POST PROCESSING / RENDER PIPELINE ---------------
+const renderPipeline = new RenderPipeline(renderer);
+const scenePass = pass(scene, camera);
+
+renderPipeline.outputNode = vignette().mul(scenePass);
+renderPipeline.render();
 
 // -------------------- INIT --------------------
 
@@ -139,10 +161,10 @@ window.addEventListener("resize", () => {
 
 renderer.setAnimationLoop(() => {
   controls.update();
-  renderer.render(scene, camera);
+  // renderer.render(scene, camera);
+  renderPipeline.render();
   stats.update();
 });
 //
 
-await renderer.init();
 await stats.init(renderer);
