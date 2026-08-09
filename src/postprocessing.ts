@@ -60,6 +60,23 @@ try {
             child.castShadow = true; // Faz o modelo projetar sombra
           });
 
+          // const rootJoint = gltf.scene.getObjectByName("_rootJoint")!;
+
+          // Lista todos os ossos do esqueleto
+          // rootJoint.traverse((child: any) => {
+          //   if (child["isBone"]) {
+          //     console.log(child.name);
+          //   }
+          // });
+
+          const leftArm = gltf.scene.getObjectByName("Arm_L_032");
+          const rightArm = gltf.scene.getObjectByName("Arm_R_042");
+
+          if (leftArm && rightArm) {
+            leftArm.rotation.z = -Math.PI * 0.16;
+            rightArm.rotation.z = -Math.PI * 2.02;
+          }
+
           return resolve(model);
         },
         undefined,
