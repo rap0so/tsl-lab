@@ -5,7 +5,7 @@ console.log(
 import * as THREE from "three/webgpu";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { Fn, length, pass, smoothstep, uv } from "three/tsl";
+import { Fn, length, pass, screenUV, smoothstep, uniform } from "three/tsl";
 import { RenderPipeline } from "three/webgpu";
 import lilgui from "lil-gui";
 import Stats from "stats-gl";
@@ -36,13 +36,23 @@ await renderer.init();
 
 //  ------------------------ VIGNETTE ------------------------
 const vignette = Fn(() => {
+  const configOut = uniform(0.6),
+    configIn = uniform(0.2);
+
+  const guiVignetteFolder = gui.addFolder("Vignette");
+  guiVignetteFolder.add(configOut, "value", 0, 1, 0.03).name("In");
+  guiVignetteFolder
+    .add(configIn, "value", 0, configOut.value, 0.03)
+    .name("Out");
+
   /**
    * uv é a coordenada da tela inteira
    * sub(.5) centraliza
    * length() dá a distancia radial
    */
-  const dist = length(uv().sub(0.5));
-  const vig = smoothstep(0.8, 0.2, dist); // 1 no centro, 0 nas bordas
+  const dist = length(screenUV.sub(0.5));
+  const vig = smoothstep(configOut, configIn, dist);
+
   return vig;
 });
 
@@ -50,8 +60,7 @@ const vignette = Fn(() => {
 const renderPipeline = new RenderPipeline(renderer);
 const scenePass = pass(scene, camera);
 
-renderPipeline.outputNode = vignette().mul(scenePass);
-renderPipeline.render();
+renderPipeline.outputNode = scenePass.mul(vignette()).xyz;
 
 // -------------------- INIT --------------------
 
