@@ -10,6 +10,7 @@ export default defineConfig({
         instancing: resolve(import.meta.dirname, "instancing.html"),
         storageBuffer: resolve(import.meta.dirname, "storage-buffer.html"),
         flyingPaper: resolve(import.meta.dirname, "flying-paper.html"),
+        movingPaper: resolve(import.meta.dirname, "moving-paper.html"),
       },
     },
   },
