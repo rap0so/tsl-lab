@@ -11,6 +11,7 @@ export default defineConfig({
         storageBuffer: resolve(import.meta.dirname, "storage-buffer.html"),
         flyingPaper: resolve(import.meta.dirname, "flying-paper.html"),
         movingPaper: resolve(import.meta.dirname, "moving-paper.html"),
+        postProcessing: resolve(import.meta.dirname, "post-processing.html"),
       },
     },
   },

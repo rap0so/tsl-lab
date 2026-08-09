@@ -1,3 +1,6 @@
+console.log(
+  `"Bed Monster" (https://skfb.ly/pMxoB) by Shedletsky_2 is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).`,
+);
 import * as THREE from "three/webgpu";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
