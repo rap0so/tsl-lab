@@ -17,8 +17,10 @@ import {
   float,
   rotateUV,
   length,
+  If,
 } from "three/tsl";
 import lilgui from "lil-gui";
+import Stats from "stats-gl";
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#08080c");
@@ -29,10 +31,12 @@ const gui = new lilgui();
 const uMouseStrength = uniform(0.03);
 const uMouseAttraction = uniform(true);
 const uPaperSpeed = uniform(1.0);
+const uMaxLife = uniform(30.0);
 
 gui.add(uMouseStrength, "value", 0, 1, 0.001).name("Mouse Power");
 gui.add(uMouseAttraction, "value").name("Mouse Attraction");
 gui.add(uPaperSpeed, "value", 1, 100, 1).name("Paper speed");
+gui.add(uMaxLife, "value", 5, 100, 1).name("Max Life");
 
 // --------------- CAMERA ---------------
 const camera = new THREE.PerspectiveCamera(
@@ -63,6 +67,7 @@ const countPaper = 269994;
 const velocityBuffer = instancedArray(countPaper, "vec3");
 const rotationBuffer = instancedArray(countPaper, "float");
 const positionBuffer = instancedArray(countPaper, "vec3");
+const lifeBuffer = instancedArray(countPaper, "float");
 
 const initParticles = Fn(() => {
   const position = positionBuffer.element(instanceIndex);
@@ -79,6 +84,10 @@ const initParticles = Fn(() => {
   const rVelocityVec = vec3(vX, vY, vZ).sub(0.5).mul(0.02);
 
   velocity.assign(rVelocityVec);
+
+  const life = lifeBuffer.element(instanceIndex);
+  const randomLifeTime = hash(instanceIndex.add(6)).mul(uMaxLife);
+  life.assign(randomLifeTime);
 })().compute(countPaper);
 await renderer.computeAsync(initParticles);
 
@@ -99,11 +108,25 @@ const updateParticles = Fn(() => {
     .div(distToMouse);
 
   const normalizedPaperSpeed = float(1000).div(uPaperSpeed);
-  // const aff = normalizedPaperSpeed.get('value')
   const curlItself = curlNoise(position).div(normalizedPaperSpeed);
 
+  // life
+  const life = lifeBuffer.element(instanceIndex);
+  life.subAssign(0.05); // time to die
+
+  If(life.lessThan(0), () => {
+    const rX = hash(instanceIndex.add(7));
+    const rY = hash(instanceIndex.add(8));
+    const rZ = hash(instanceIndex.add(9));
+    const newPosition = vec3(rX, rY, rZ).sub(0.5).mul(200);
+
+    position.assign(newPosition);
+    life.assign(hash(instanceIndex.add(6)).mul(uMaxLife));
+  });
+  //
+
   const friction = 0.95;
-  velocity.assign(add(curlItself, mouseForce)).mul(friction);
+  velocity.assign(add(curlItself, mouseForce).mul(friction));
   position.addAssign(velocity.mul(10));
 
   const rotation = rotationBuffer.element(instanceIndex);
@@ -197,10 +220,16 @@ const material = new THREE.MeshStandardNodeMaterial({
   side: THREE.DoubleSide,
 });
 
+const currentLife = lifeBuffer.element(instanceIndex);
+const lifeRatio = currentLife.div(uMaxLife);
+
 material.positionNode = rotateUV(
   positionLocal,
   rotationBuffer.element(instanceIndex),
-).add(positionBuffer.element(instanceIndex));
+)
+  .mul(lifeRatio)
+  .add(positionBuffer.element(instanceIndex));
+
 material.colorNode = texture(texturePaper).mul(colorNode);
 
 const mesh = new THREE.InstancedMesh(
@@ -240,6 +269,13 @@ renderer.setAnimationLoop(() => {
   controls.update();
   renderer.computeAsync(updateParticles);
   renderer.render(scene, camera);
+  stats.update();
 });
 
 await renderer.init();
+
+// Stats
+const stats = new Stats({ trackGPU: true });
+stats.init(renderer);
+
+document.body.appendChild(stats.dom);
