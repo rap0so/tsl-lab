@@ -5,9 +5,22 @@ console.log(
 import * as THREE from "three/webgpu";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { mrt, normalView, output, pass } from "three/tsl";
+import {
+  dot,
+  float,
+  mrt,
+  normalView,
+  output,
+  pass,
+  screenUV,
+  step,
+  uniform,
+  vec2,
+  vec3,
+} from "three/tsl";
 import { RenderPipeline } from "three/webgpu";
 import Stats from "stats-gl";
+import GUI from "lil-gui";
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#08080c");
@@ -40,12 +53,47 @@ scenePass.setMRT(
   }),
 );
 
-// ------------------ EXTRA BUFFER ------------------
-// const colorBuffer = scenePass.getTextureNode("output");
 const normalBuffer = scenePass.getTextureNode("normal");
 
+// ------------------------- GUI -------------------------
+const gui = new GUI();
+const guiThickness = uniform(1.0);
+gui.add(guiThickness, "value", 0, 5, 1).name("Thickness");
+
+const texelSize = float(1)
+  .div(window.document.body.clientWidth)
+  .mul(guiThickness);
+
+/**
+ * Para criar a borda precisamos saber se as superficies estão alinhadas
+ * para isso pegamos a posição do centro da superficie (normal)
+ * o mínimo (texelSize) do lado direito e o mínimo de cima
+ *
+ * o sample é um "me dá a cor da textura nesta coordenada específica que eu escolhi"
+ */
+const normalCenter = normalBuffer;
+const normalRight = normalBuffer.sample(screenUV.add(vec2(texelSize, 0)));
+const normalUp = normalBuffer.sample(screenUV.add(vec2(0, texelSize)));
+
+/**
+ * Agora vamos comparar usando product dot
+ */
+
+const edgeRight = dot(normalCenter.xyz, normalRight.xyz);
+const edgeUp = dot(normalCenter.xyz, normalUp.xyz);
+const edgeNum = edgeRight.mul(edgeUp);
+const constantEdge = 0.9;
+/**
+ * O step é um x >= edge ? 1 : 0
+ */
+
+const outline = vec3(step(constantEdge, edgeNum));
+
+// ------------------ EXTRA BUFFER ------------------
+const colorBuffer = scenePass.getTextureNode("output");
+
 // ---------------- Render outputNode ----------------
-renderPipeline.outputNode = normalBuffer;
+renderPipeline.outputNode = colorBuffer.mul(outline);
 
 // -------------------- INIT --------------------
 
