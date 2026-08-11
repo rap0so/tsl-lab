@@ -4,7 +4,7 @@ canvas {
 }
 
 body {
-  margin: 0;
+  margin: 0 !important;
 }
 
 /* --- experiment pages (full-bleed canvas) keep the old baseline --- */
@@ -39,7 +39,7 @@ body:has(#shader-canvas) {
   position: relative;
   max-width: 960px;
   margin: 0 auto;
-  padding: 0 1.5rem 4rem;
+  padding: 0;
 }
 
 .site-header {
@@ -63,7 +63,9 @@ body:has(#shader-canvas) {
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 0.4rem 0.9rem;
-  transition: color 0.15s, border-color 0.15s;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
 }
 
 .x-link:hover {
@@ -124,7 +126,9 @@ body:has(#shader-canvas) {
   gap: 0.75rem;
   background: rgba(20, 20, 26, 0.5);
   backdrop-filter: blur(6px);
-  transition: border-color 0.15s, transform 0.15s;
+  transition:
+    border-color 0.15s,
+    transform 0.15s;
 }
 
 .experiment-card:hover {
