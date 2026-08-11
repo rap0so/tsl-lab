@@ -5,16 +5,12 @@ console.log(
 import * as THREE from "three/webgpu";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { Fn, length, pass, screenUV, smoothstep, uniform } from "three/tsl";
+import { mrt, normalView, output, pass } from "three/tsl";
 import { RenderPipeline } from "three/webgpu";
-import lilgui from "lil-gui";
 import Stats from "stats-gl";
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#08080c");
-
-// -------------- GUI ---------------
-const gui = new lilgui();
 
 // --------------- CAMERA ---------------
 const camera = new THREE.PerspectiveCamera(
@@ -34,33 +30,22 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 document.body.appendChild(renderer.domElement);
 await renderer.init();
 
-//  ------------------------ VIGNETTE ------------------------
-const vignette = Fn(() => {
-  const configOut = uniform(0.6),
-    configIn = uniform(0.2);
-
-  const guiVignetteFolder = gui.addFolder("Vignette");
-  guiVignetteFolder.add(configOut, "value", 0, 1, 0.03).name("In");
-  guiVignetteFolder
-    .add(configIn, "value", 0, configOut.value, 0.03)
-    .name("Out");
-
-  /**
-   * uv é a coordenada da tela inteira
-   * sub(.5) centraliza
-   * length() dá a distancia radial
-   */
-  const dist = length(screenUV.sub(0.5));
-  const vig = smoothstep(configOut, configIn, dist);
-
-  return vig;
-});
-
 //  -------------- POST PROCESSING / RENDER PIPELINE ---------------
 const renderPipeline = new RenderPipeline(renderer);
 const scenePass = pass(scene, camera);
+scenePass.setMRT(
+  mrt({
+    output,
+    normal: normalView,
+  }),
+);
 
-renderPipeline.outputNode = scenePass.mul(vignette()).xyz;
+// ------------------ EXTRA BUFFER ------------------
+// const colorBuffer = scenePass.getTextureNode("output");
+const normalBuffer = scenePass.getTextureNode("normal");
+
+// ---------------- Render outputNode ----------------
+renderPipeline.outputNode = normalBuffer;
 
 // -------------------- INIT --------------------
 

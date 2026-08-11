@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tsl-lab</title>
+    <script>
+      // Fallback for hosts with no server-side redirect config (e.g. GitHub
+      // Pages): map old shared .html links to their new clean routes.
+      var legacyRoutes = {
+        "/texture.html": "/texture",
+        "/instancing.html": "/instancing",
+        "/storage-buffer.html": "/particles",
+        "/post-processing.html": "/postprocessing",
+      };
+      var target = legacyRoutes[location.pathname];
+      if (target) {
+        location.replace(target);
+      }
+    </script>
+  </head>
+  <body>
+    <p>
+      Page not found. Looking for an experiment? Go to
+      <a href="/">tsl-lab</a>.
+    </p>
+  </body>
+</html>

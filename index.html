@@ -3,12 +3,184 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="stylesheet" href="./src/style.css" />
+    <link rel="stylesheet" href="style.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>tsl-lab</title>
+    <meta
+      name="description"
+      content="tsl-lab: a 25-day sprint of daily Three.js Shading Language + WebGPU experiments, built in public on the way to Three.js Conference Paris 2026."
+    />
+    <title>tsl-lab — TSL/WebGPU experiments</title>
   </head>
   <body>
-    <div id="app"></div>
+    <canvas id="shader-canvas" aria-hidden="true"></canvas>
+
+    <div id="app">
+      <header class="site-header">
+        <span class="wordmark">tsl-lab</span>
+        <a
+          class="x-link"
+          href="https://x.com/B1llCreator"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          @B1llCreator on X ↗
+        </a>
+      </header>
+
+      <main>
+        <section class="hero">
+          <h1>tsl-lab</h1>
+          <p class="hero-tagline">
+            A daily-experiment sprint in Three.js Shading Language + WebGPU —
+            one shader, one bug, one small win at a time.
+          </p>
+          <p class="hero-context">
+            25 days, 11 years of frontend, 0 prior shader experience. Training
+            for
+            <strong
+              ><a
+                href="https://x.com/threejsconf"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Three.js Conference Paris</a
+              ></strong
+            >, <time datetime="2026-09">September 2026</time>. Follow along or
+            watch it break in real time.
+          </p>
+        </section>
+
+        <section class="experiments" aria-label="Experiments">
+          <ul class="experiment-grid">
+            <li class="experiment-card">
+              <a class="experiment-link" href="/instancing">
+                <span class="experiment-url">/instancing</span>
+                <h2>Ten Thousand, One Draw Call</h2>
+                <p>
+                  10,000 instances, each with position, color, and scale derived
+                  from a hash — no per-object JS loop, no mercy for the GPU.
+                </p>
+                <span class="experiment-stat">1 draw call</span>
+              </a>
+              <a
+                class="build-link"
+                href="https://x.com/B1llCreator/status/2084933540798398685"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                how it was built ↗
+              </a>
+            </li>
+
+            <li class="experiment-card">
+              <a class="experiment-link" href="/texture">
+                <span class="experiment-url">/texture</span>
+                <h2>No Seams at the Poles</h2>
+                <p>
+                  Triplanar mapping on a deformed sphere. UVs give up near the
+                  poles; triplanar doesn't care.
+                </p>
+                <span class="experiment-stat">0 visible seams</span>
+              </a>
+              <a
+                class="build-link"
+                href="https://x.com/B1llCreator/status/2084687073445855417"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                how it was built ↗
+              </a>
+            </li>
+
+            <li class="experiment-card">
+              <a class="experiment-link" href="/flying-paper">
+                <span class="experiment-url">/flying-paper</span>
+                <h2>Half a Million Points, Still 60fps</h2>
+                <p>
+                  Compute-shader particles with curl noise, swirl, self rotation
+                </p>
+                <span class="experiment-stat">
+                  500,994 particles · 60fps · 2 draw calls
+                </span>
+              </a>
+              <a
+                class="build-link"
+                href="https://x.com/B1llCreator/status/2086445894799597670"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                how it was built ↗
+              </a>
+            </li>
+
+            <li class="experiment-card">
+              <a class="experiment-link" href="/moving-paper">
+                <span class="experiment-url">/moving-paper</span>
+                <h2>
+                  Half a Million Points, Still 60fps AND mouse iteractive!
+                </h2>
+                <p>Magnet on mouse cursor</p>
+                <span class="experiment-stat">
+                  No loading screen, quickest Cmd+R of old west 🤠
+                </span>
+              </a>
+              <a
+                class="build-link"
+                href="https://x.com/B1llCreator/status/2086191395434328527"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                how it was built ↗
+              </a>
+            </li>
+
+            <li class="experiment-card">
+              <a class="experiment-link" href="/postprocessing">
+                <span class="experiment-url">/postprocessing</span>
+                <h2>Finding Edges Without an Edge Detector</h2>
+                <p>
+                  A render pipeline with vignette and edge detection via MRT —
+                  screen-space normals compared with a dot product, no Sobel
+                  filter in sight.
+                </p>
+                <span class="experiment-stat">MRT · 2 render targets</span>
+              </a>
+              <a
+                class="build-link"
+                href="https://x.com/B1llCreator/status/2086696546159231364"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                how it was built ↗
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p class="footer-note">
+          Learning in public — every experiment above shipped in one day, bugs
+          included.
+        </p>
+        <nav class="footer-links">
+          <a
+            href="https://x.com/B1llCreator"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            X
+          </a>
+          <a
+            href="https://awsomee.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            awsomee.com
+          </a>
+        </nav>
+      </footer>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

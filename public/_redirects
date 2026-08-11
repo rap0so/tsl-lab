@@ -1,0 +1,12 @@
+# Netlify: old shared .html links -> clean routes
+/texture.html /texture 301!
+/instancing.html /instancing 301!
+/storage-buffer.html /particles 301!
+/post-processing.html /postprocessing 301!
+
+# Ensure extensionless routes resolve to their folder's index.html
+# even if Netlify's default pretty-url resolution ever changes.
+/texture /texture/index.html 200
+/instancing /instancing/index.html 200
+/particles /particles/index.html 200
+/postprocessing /postprocessing/index.html 200

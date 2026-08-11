@@ -1,0 +1,16 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/texture.html", "destination": "/texture", "permanent": true },
+    { "source": "/instancing.html", "destination": "/instancing", "permanent": true },
+    { "source": "/storage-buffer.html", "destination": "/particles", "permanent": true },
+    { "source": "/post-processing.html", "destination": "/postprocessing", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/texture", "destination": "/texture/index.html" },
+    { "source": "/instancing", "destination": "/instancing/index.html" },
+    { "source": "/particles", "destination": "/particles/index.html" },
+    { "source": "/postprocessing", "destination": "/postprocessing/index.html" }
+  ]
+}
