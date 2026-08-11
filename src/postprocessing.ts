@@ -5,7 +5,17 @@ console.log(
 import * as THREE from "three/webgpu";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { Fn, length, pass, screenUV, smoothstep, uniform } from "three/tsl";
+import {
+  Fn,
+  length,
+  mrt,
+  normalView,
+  output,
+  pass,
+  screenUV,
+  smoothstep,
+  uniform,
+} from "three/tsl";
 import { RenderPipeline } from "three/webgpu";
 import lilgui from "lil-gui";
 import Stats from "stats-gl";
@@ -59,8 +69,19 @@ const vignette = Fn(() => {
 //  -------------- POST PROCESSING / RENDER PIPELINE ---------------
 const renderPipeline = new RenderPipeline(renderer);
 const scenePass = pass(scene, camera);
+scenePass.setMRT(
+  mrt({
+    output,
+    normal: normalView,
+  }),
+);
 
-renderPipeline.outputNode = scenePass.mul(vignette()).xyz;
+// ------------------ EXTRA BUFFER ------------------
+// const colorBuffer = scenePass.getTextureNode("output");
+const normalBuffer = scenePass.getTextureNode("normal");
+
+// ---------------- Render outputNode ----------------
+renderPipeline.outputNode = normalBuffer;
 
 // -------------------- INIT --------------------
 

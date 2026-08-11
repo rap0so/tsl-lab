@@ -6,12 +6,15 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(import.meta.dirname, "index.html"),
-        texture: resolve(import.meta.dirname, "texture.html"),
-        instancing: resolve(import.meta.dirname, "instancing.html"),
-        storageBuffer: resolve(import.meta.dirname, "storage-buffer.html"),
+        texture: resolve(import.meta.dirname, "texture/index.html"),
+        instancing: resolve(import.meta.dirname, "instancing/index.html"),
+        particles: resolve(import.meta.dirname, "particles/index.html"),
+        postprocessing: resolve(
+          import.meta.dirname,
+          "postprocessing/index.html",
+        ),
         flyingPaper: resolve(import.meta.dirname, "flying-paper.html"),
         movingPaper: resolve(import.meta.dirname, "moving-paper.html"),
-        postProcessing: resolve(import.meta.dirname, "post-processing.html"),
       },
     },
   },
