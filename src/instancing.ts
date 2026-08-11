@@ -50,7 +50,7 @@ const uAmp = uniform(1);
 
 // -------------- GUI ---------------
 const gui = new lilgui();
-const guiFolder = gui.addFolder("Crazy Ball 🪩");
+const guiFolder = gui.addFolder("🪩");
 guiFolder.add(uAmp, "value", 0, 2, 0.01).name("Amplification");
 
 //  ------- Normal Mode ------------
