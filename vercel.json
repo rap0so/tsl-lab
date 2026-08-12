@@ -21,6 +21,11 @@
       "source": "/post-processing.html",
       "destination": "/postprocessing",
       "permanent": true
+    },
+    {
+      "source": "/ssr.html",
+      "destination": "/ssr",
+      "permanent": true
     }
   ],
   "rewrites": [
@@ -38,7 +43,7 @@
     },
     {
       "source": "/ssr",
-      "destination": "/postprocessing-2/index.html"
+      "destination": "/ssr/index.html"
     }
   ]
 }

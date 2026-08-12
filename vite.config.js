@@ -12,6 +12,7 @@ export default defineConfig({
           import.meta.dirname,
           "postprocessing/index.html",
         ),
+        ssr: resolve(import.meta.dirname, "ssr.html"),
         flyingPaper: resolve(import.meta.dirname, "flying-paper.html"),
         movingPaper: resolve(import.meta.dirname, "moving-paper.html"),
       },
