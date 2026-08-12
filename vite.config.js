@@ -8,7 +8,6 @@ export default defineConfig({
         main: resolve(import.meta.dirname, "index.html"),
         texture: resolve(import.meta.dirname, "texture/index.html"),
         instancing: resolve(import.meta.dirname, "instancing/index.html"),
-        particles: resolve(import.meta.dirname, "particles/index.html"),
         postprocessing: resolve(
           import.meta.dirname,
           "postprocessing/index.html",
