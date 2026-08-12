@@ -6,21 +6,24 @@ import * as THREE from "three/webgpu";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import {
-  dot,
-  float,
+  metalness,
   mrt,
   normalView,
   output,
+  packNormalToRGB,
   pass,
-  screenUV,
-  step,
-  uniform,
+  roughness,
+  sample,
+  unpackRGBToNormal,
   vec2,
-  vec3,
 } from "three/tsl";
+import { ssr } from "three/addons/tsl/display/SSRNode.js";
 import { RenderPipeline } from "three/webgpu";
-import Stats from "stats-gl";
-import GUI from "lil-gui";
+import { Inspector } from "three/examples/jsm/inspector/Inspector.js";
+import { RoomEnvironment } from "three/examples/jsm/Addons.js";
+import { smaa } from "three/examples/jsm/tsl/display/SMAANode.js";
+
+// ---------------------- SCENE ----------------------
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#08080c");
@@ -36,72 +39,63 @@ camera.position.set(0, 0, 3.2);
 
 //   -------------------- RENDERER --------------------
 const renderer = new THREE.WebGPURenderer({ antialias: true });
+renderer.inspector = new Inspector();
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Deixa a sombra mais suave
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 document.body.appendChild(renderer.domElement);
 await renderer.init();
+// ---------------------- ENVIRONMENT ----------------------
+const environment = new RoomEnvironment();
+const pmremGenerator = new THREE.PMREMGenerator(renderer);
+scene.environment = pmremGenerator.fromScene(environment, 0.04).texture;
+scene.environmentIntensity = 1.25;
 
 //  -------------- POST PROCESSING / RENDER PIPELINE ---------------
 const renderPipeline = new RenderPipeline(renderer);
+// Isso aqui em baixo, o pass, é um hook, ao invés de mandar direto pra tela passe por aqui
 const scenePass = pass(scene, camera);
 scenePass.setMRT(
   mrt({
     output,
-    normal: normalView,
+    normal: packNormalToRGB(normalView),
+    metalrough: vec2(metalness, roughness), // pack metalness and roughness into a single attachment
   }),
 );
 
-const normalBuffer = scenePass.getTextureNode("normal");
+// ------------------ EXTRA NODE ------------------
+const normalNode = scenePass.getTextureNode("normal").toInspector("Normal");
 
-// ------------------------- GUI -------------------------
-const gui = new GUI();
-const guiThickness = uniform(1.0);
-gui.add(guiThickness, "value", 0, 5, 1).name("Thickness");
+const sceneNormal = sample((uv) => {
+  return unpackRGBToNormal(normalNode.sample(uv));
+});
+const colorNode = scenePass.getTextureNode("output").toInspector("Color Node");
+// Thanks Mugen87 and sunag: https://github.com/mrdoob/three.js/blob/master/examples/webgpu_postprocessing_ssr.html#L165
+const metalRoughNode = scenePass.getTextureNode("metalrough");
+const depthNode = scenePass.getTextureNode("depth");
 
-const texelSize = float(1)
-  .div(window.document.body.clientWidth)
-  .mul(guiThickness);
-
-/**
- * Para criar a borda precisamos saber se as superficies estão alinhadas
- * para isso pegamos a posição do centro da superficie (normal)
- * o mínimo (texelSize) do lado direito e o mínimo de cima
- *
- * o sample é um "me dá a cor da textura nesta coordenada específica que eu escolhi"
- */
-const normalCenter = normalBuffer;
-const normalRight = normalBuffer.sample(screenUV.add(vec2(texelSize, 0)));
-const normalUp = normalBuffer.sample(screenUV.add(vec2(0, texelSize)));
-
-/**
- * Agora vamos comparar usando product dot
- */
-
-const edgeRight = dot(normalCenter.xyz, normalRight.xyz);
-const edgeUp = dot(normalCenter.xyz, normalUp.xyz);
-const edgeNum = edgeRight.mul(edgeUp);
-const constantEdge = 0.9;
-/**
- * O step é um x >= edge ? 1 : 0
- */
-
-const outline = vec3(step(constantEdge, edgeNum));
-
-// ------------------ EXTRA BUFFER ------------------
-const colorBuffer = scenePass.getTextureNode("output");
+// ------------------- POST PROCESSING -------------------
+const ssrPass = ssr(colorNode, depthNode, sceneNormal, {
+  camera,
+  metalnessNode: metalRoughNode.r,
+  roughnessNode: metalRoughNode.g,
+}).toInspector("SSR Pass");
+ssrPass.quality.value = 1;
+ssrPass.blurQuality = 3;
+ssrPass.maxDistance.value = 1;
+ssrPass.thickness.value = 0.03;
 
 // ---------------- Render outputNode ----------------
-renderPipeline.outputNode = colorBuffer.mul(outline);
+renderPipeline.outputNode = smaa(colorNode.add(ssrPass.rgb));
 
 // -------------------- INIT --------------------
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-const keyLight = new THREE.DirectionalLight(0xffffff, 3);
+scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+const keyLight = new THREE.DirectionalLight(0xffffff, 1);
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.width = 2048;
 keyLight.shadow.mapSize.height = 2048;
@@ -162,6 +156,8 @@ const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(10, 5),
   new THREE.MeshStandardMaterial({
     side: THREE.DoubleSide,
+    metalness: 1,
+    roughness: 0.5,
   }),
 );
 floor.rotation.x = Math.PI * 0.6;
@@ -192,8 +188,6 @@ torus.material.color = new THREE.Color("rgb(0, 191, 255)");
 scene.add(box, torus);
 
 // --------------------- Stats ---------------------
-const stats = new Stats({ trackGPU: true });
-document.body.appendChild(stats.dom);
 
 window.addEventListener("resize", () => {
   camera.aspect = innerWidth / innerHeight;
@@ -203,10 +197,5 @@ window.addEventListener("resize", () => {
 
 renderer.setAnimationLoop(() => {
   controls.update();
-  // renderer.render(scene, camera);
   renderPipeline.render();
-  stats.update();
 });
-//
-
-await stats.init(renderer);
