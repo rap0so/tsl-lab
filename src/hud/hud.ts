@@ -1,9 +1,10 @@
 import * as THREE from "three/webgpu";
 import labData from "./lab-network-data.json";
-import { addUpdateTask, renderer, scene } from "../utils/setup";
+import { addUpdateTask, scene } from "../utils/setup";
 import normalizeMinMax from "./normalizeMinMax";
 import getMinMax from "./getMinMax";
 import getMatchingNodesTechnique from "./matchingNodesTechnique";
+import "./postprocessing";
 
 import linesConnectingNodes from "./linesConnectingNodes";
 import nodesCreator from "./nodesCreator";

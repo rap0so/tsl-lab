@@ -1,5 +1,6 @@
 import * as THREE from "three/webgpu";
 import { CSS2DRenderer, OrbitControls } from "three/examples/jsm/Addons.js";
+import { Inspector } from "three/addons/inspector/Inspector.js";
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#08080c");
@@ -24,9 +25,12 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(0, 0, 8);
 
 const renderer = new THREE.WebGPURenderer({ antialias: true });
+renderer.toneMapping = THREE.ReinhardToneMapping;
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 document.body.appendChild(renderer.domElement);
+
+renderer.inspector = new Inspector();
 await renderer.init();
 
 // -------------------- INIT --------------------

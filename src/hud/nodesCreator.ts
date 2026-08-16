@@ -18,7 +18,7 @@ const nodesCreator = (mappedNodes: MappedNode[]) => {
     label.position.set(0, mNode.scale + 0.3, 0); // a bit above the node
 
     const mesh = new THREE.Mesh(
-      new THREE.SphereGeometry(mNode.scale, 16, 16),
+      new THREE.SphereGeometry(mNode.scale, 32, 32),
       new THREE.MeshBasicMaterial({ color: nodesColor }),
     );
     mesh.position.copy(mNode.position);
