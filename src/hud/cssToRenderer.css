@@ -1,0 +1,8 @@
+.node-label {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: #8fb4d0;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(80, 200, 255, 0.5); /* glow */
+  white-space: nowrap;
+}
