@@ -63,7 +63,7 @@ key.position.set(3, 4, 2);
 scene.add(key);
 
 // --------------- Paper generator ------------------
-const countPaper = 269994;
+const countPaper = 500000;
 const velocityBuffer = instancedArray(countPaper, "vec3");
 const rotationBuffer = instancedArray(countPaper, "float");
 const positionBuffer = instancedArray(countPaper, "vec3");

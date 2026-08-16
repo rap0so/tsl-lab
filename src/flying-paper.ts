@@ -56,7 +56,7 @@ const uMouse = uniform(vec2(0, 0));
 // --------- Actions -----------
 
 // --------------- Paper generator ------------------
-const countPaper = 269994;
+const countPaper = 500000;
 const velocityBuffer = instancedArray(countPaper, "vec3");
 const rotationBuffer = instancedArray(countPaper, "float");
 const positionBuffer = instancedArray(countPaper, "vec3");
