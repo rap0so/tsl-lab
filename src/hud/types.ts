@@ -9,3 +9,9 @@ export type MappedNode = {
   category: string;
   techniques: string[];
 };
+
+export type MatchingNodeTech = {
+  from: MappedNode;
+  to: MappedNode;
+  matches: number;
+};

@@ -21,7 +21,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   5000,
 );
-camera.position.set(0, 0, 15);
+camera.position.set(0, 0, 8);
 
 const renderer = new THREE.WebGPURenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
@@ -40,11 +40,13 @@ window.addEventListener("resize", () => {
   renderer.setSize(innerWidth, innerHeight);
 });
 
-renderer.setAnimationLoop(() => {
+const animate = () => {
   controls.update();
   // renderer.computeAsync(updateParticles);
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
-});
+};
+
+renderer.setAnimationLoop(animate);
 
 export { renderer, scene, camera, controls };
