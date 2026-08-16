@@ -1,0 +1,122 @@
+{
+    "nodes": [
+        {
+            "id": "displaced-sphere",
+            "label": "Displaced Sphere",
+            "order": 1,
+            "category": "geometry",
+            "techniques": [
+                "noise",
+                "normal-recalc",
+                "mouse-uniform",
+                "cosine-palette"
+            ]
+        },
+        {
+            "id": "texture-triplanar",
+            "label": "Triplanar Texture",
+            "order": 2,
+            "category": "geometry",
+            "techniques": [
+                "texture",
+                "triplanar",
+                "noise",
+                "normal-recalc"
+            ]
+        },
+        {
+            "id": "instancing",
+            "label": "10k Instances",
+            "order": 3,
+            "category": "geometry",
+            "techniques": [
+                "instancing",
+                "hash",
+                "cosine-palette"
+            ]
+        },
+        {
+            "id": "moving-paper",
+            "label": "Moving Paper",
+            "order": 4,
+            "category": "compute",
+            "techniques": [
+                "compute",
+                "storage-buffers",
+                "curl-noise",
+                "instancing",
+                "rotation-matrix"
+            ]
+        },
+        {
+            "id": "flying-paper",
+            "label": "Flying Paper",
+            "order": 5,
+            "category": "compute",
+            "techniques": [
+                "compute",
+                "storage-buffers",
+                "curl-noise",
+                "swirl",
+                "raycasting",
+                "lifetime",
+                "texture",
+                "instancing",
+                "rotation-matrix",
+                "damping"
+            ]
+        },
+        {
+            "id": "vignette",
+            "label": "Vignette",
+            "order": 6,
+            "category": "postprocessing",
+            "techniques": [
+                "render-pipeline",
+                "screen-uv",
+                "smoothstep"
+            ]
+        },
+        {
+            "id": "edge-detection",
+            "label": "Cartoon Edges",
+            "order": 7,
+            "category": "postprocessing",
+            "techniques": [
+                "render-pipeline",
+                "mrt",
+                "normal-buffer",
+                "dot-product",
+                "edge-detection"
+            ]
+        },
+        {
+            "id": "ssr",
+            "label": "Screen Space Reflections",
+            "order": 8,
+            "category": "postprocessing",
+            "techniques": [
+                "render-pipeline",
+                "mrt",
+                "normal-buffer",
+                "depth-buffer",
+                "ray-marching",
+                "smaa"
+            ]
+        },
+        {
+            "id": "ssgi",
+            "label": "Screen Space GI",
+            "order": 9,
+            "category": "postprocessing",
+            "techniques": [
+                "render-pipeline",
+                "mrt",
+                "normal-buffer",
+                "depth-buffer",
+                "ray-marching",
+                "color-bleed"
+            ]
+        }
+    ]
+}
