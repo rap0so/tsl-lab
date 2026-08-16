@@ -15,6 +15,7 @@ export default defineConfig({
         ssr: resolve(import.meta.dirname, "ssr.html"),
         flyingPaper: resolve(import.meta.dirname, "flying-paper.html"),
         movingPaper: resolve(import.meta.dirname, "moving-paper.html"),
+        hud: resolve(import.meta.dirname, "hud/index.html"),
       },
     },
   },

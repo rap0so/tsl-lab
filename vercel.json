@@ -23,6 +23,11 @@
       "permanent": true
     },
     {
+      "source": "/hud.html",
+      "destination": "/hud",
+      "permanent": true
+    },
+    {
       "source": "/ssr.html",
       "destination": "/ssr",
       "permanent": true
@@ -44,6 +49,10 @@
     {
       "source": "/ssr",
       "destination": "/ssr/index.html"
+    },
+    {
+      "source": "/hud",
+      "destination": "/hud/index.html"
     }
   ]
 }
