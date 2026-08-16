@@ -6,6 +6,8 @@ import { scene } from "../utils/setup";
 
 const nodeMeshes = new Map<string, THREE.Mesh>();
 
+const nodesColor = new THREE.Color("#44aaff");
+
 const nodesCreator = (mappedNodes: MappedNode[]) => {
   mappedNodes.forEach((mNode) => {
     const divLabel = document.createElement("div");
@@ -17,14 +19,21 @@ const nodesCreator = (mappedNodes: MappedNode[]) => {
 
     const mesh = new THREE.Mesh(
       new THREE.SphereGeometry(mNode.scale, 16, 16),
-      new THREE.MeshBasicMaterial({ color: 0x44aaff }),
+      new THREE.MeshBasicMaterial({ color: nodesColor }),
     );
     mesh.position.copy(mNode.position);
+
+    // We're storing these data to mesh's user data
+    mesh.userData.baseScale = mNode.scale;
+    mesh.userData.baseColor = nodesColor;
+
     nodeMeshes.set(mNode.id, mesh);
 
     mesh.add(label); // mesh's son - it follows automatically
     scene.add(mesh);
   });
+
+  return nodeMeshes;
 };
 
 export default nodesCreator;

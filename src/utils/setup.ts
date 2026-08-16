@@ -40,11 +40,20 @@ window.addEventListener("resize", () => {
   renderer.setSize(innerWidth, innerHeight);
 });
 
-const animate = () => {
+const updateTasks: Function[] = [];
+
+export function addUpdateTask(taskFn: Function) {
+  updateTasks.push(taskFn);
+}
+
+const animate = (time: number, frame?: XRFrame) => {
   controls.update();
-  // renderer.computeAsync(updateParticles);
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
+
+  for (const task of updateTasks) {
+    task(time, frame);
+  }
 };
 
 renderer.setAnimationLoop(animate);
