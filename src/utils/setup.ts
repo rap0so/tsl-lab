@@ -46,7 +46,7 @@ window.addEventListener("resize", () => {
 
 const updateTasks: Function[] = [];
 
-export function addUpdateTask(taskFn: Function) {
+export function addUpdateTask(taskFn: (time: number, frame: XRFrame) => any) {
   updateTasks.push(taskFn);
 }
 

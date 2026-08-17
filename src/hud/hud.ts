@@ -5,6 +5,7 @@ import normalizeMinMax from "./normalizeMinMax";
 import getMinMax from "./getMinMax";
 import getMatchingNodesTechnique from "./matchingNodesTechnique";
 import "./postprocessing";
+import runCameraAnimation from "./cameraAnimation";
 
 import linesConnectingNodes from "./linesConnectingNodes";
 import nodesCreator from "./nodesCreator";
@@ -17,6 +18,8 @@ const categoryToY: Record<string, number> = {
   compute: 0,
   postprocessing: 3,
 };
+
+runCameraAnimation();
 
 const orders = labData.nodes.map((n) => n.order);
 const [minOrder, maxOrder] = getMinMax(orders);
@@ -63,7 +66,7 @@ scene.add(scanLineMesh);
 
 const highlightNodeColor = new THREE.Color("#00ff6e");
 addUpdateTask(() => {
-  scanLineMesh.position.y += 0.05;
+  scanLineMesh.position.y += 0.03;
   if (scanLineMesh.position.y > 4) {
     scanLineMesh.position.y = grid.position.y - 2;
   }
