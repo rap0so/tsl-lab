@@ -5,10 +5,10 @@ import normalizeMinMax from "./normalizeMinMax";
 import getMinMax from "./getMinMax";
 import getMatchingNodesTechnique from "./matchingNodesTechnique";
 import "./postprocessing";
-import runCameraAnimation from "./cameraAnimation";
 
 import linesConnectingNodes from "./linesConnectingNodes";
 import nodesCreator from "./nodesCreator";
+import bootSequence from "./boot/bootAnimation";
 
 const SPREAD_X = 10;
 const SPREAD_Z = 6;
@@ -19,7 +19,7 @@ const categoryToY: Record<string, number> = {
   postprocessing: 3,
 };
 
-runCameraAnimation();
+bootSequence();
 
 const orders = labData.nodes.map((n) => n.order);
 const [minOrder, maxOrder] = getMinMax(orders);
@@ -61,6 +61,7 @@ const scanLineMat = new THREE.MeshBasicMaterial({
 scanLineMat.color;
 const scanLineMesh = new THREE.Mesh(scanLineGeo, scanLineMat);
 scanLineMesh.rotation.x = Math.PI / 2;
+scanLineMesh.position.y = -5;
 
 scene.add(scanLineMesh);
 
@@ -76,7 +77,6 @@ addUpdateTask(() => {
 
     const glow = Math.max(0, 1 - dist / 0.8); // 1 quando alinhado, 0 quando longe (>0.8)
 
-    // reage: escala pulsa
     const base = mesh.userData.baseScale;
     mesh.scale.setScalar(base * (1 + glow * 0.6));
 
