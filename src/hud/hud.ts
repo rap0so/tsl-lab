@@ -10,6 +10,7 @@ import linesConnectingNodes from "./linesConnectingNodes";
 import nodesCreator from "./nodesCreator";
 import bootSequence from "./boot/bootAnimation";
 import printLine from "./boot/printLine";
+import showFallBack from "./boot/showFallBack";
 
 const SPREAD_X = 10;
 const SPREAD_Z = 6;
@@ -22,11 +23,13 @@ const categoryToY: Record<string, number> = {
 
 (async function init() {
   const hasWebGPU = navigator.gpu !== undefined;
-  if (!hasWebGPU) {
+  if (hasWebGPU) {
     printLine("WEBGPU BACKEND", false);
-    // printLineError('UNAVAILABLE — STATIC FALLBACK');
-    // showFallback();
-    return;
+    printLine("UNAVAILABLE — BOOTING FALLBACK");
+
+    return setTimeout(() => {
+      showFallBack();
+    }, 3000);
   }
 
   printLine("WEBGPU BACKEND");

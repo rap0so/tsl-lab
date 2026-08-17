@@ -40,3 +40,21 @@
     opacity: 0;
   }
 }
+
+/*  */
+
+#video-fallback {
+  position: absolute;
+  z-index: 11;
+  background: red;
+  inset: 0;
+  max-width: 800px;
+  margin: auto;
+  aspect-ratio: 16 / 9;
+  opacity: 0;
+}
+
+#video-fallback.on {
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}

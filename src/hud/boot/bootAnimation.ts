@@ -35,7 +35,6 @@ const bootSequence = () => {
       duration: 1,
       onComplete: () => {
         bootLoadingWrapper.remove();
-        console.log("removed");
       },
     },
     ">",
