@@ -31,7 +31,6 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 document.body.appendChild(renderer.domElement);
 
 renderer.inspector = new Inspector();
-await renderer.init();
 
 // -------------------- INIT --------------------
 
