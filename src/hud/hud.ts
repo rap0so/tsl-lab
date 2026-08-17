@@ -23,7 +23,7 @@ const categoryToY: Record<string, number> = {
 
 (async function init() {
   const hasWebGPU = navigator.gpu !== undefined;
-  if (hasWebGPU) {
+  if (!hasWebGPU) {
     printLine("WEBGPU BACKEND", false);
     printLine("UNAVAILABLE — BOOTING FALLBACK");
 
