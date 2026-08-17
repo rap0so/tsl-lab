@@ -1,7 +1,6 @@
 import gsap from "gsap";
 import cameraAnimation from "../cameraAnimation";
 import printLine from "./printLine";
-import "./styles.css";
 
 const bootLoadingWrapper = document.getElementById("boot-loading")!;
 

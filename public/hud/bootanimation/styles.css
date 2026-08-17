@@ -24,6 +24,9 @@
 .boot-line .ok {
   color: #00ff6e;
 }
+.boot-line .error {
+  color: #eb442a;
+}
 .boot-cursor {
   animation: blink 1s steps(2) infinite;
 }
