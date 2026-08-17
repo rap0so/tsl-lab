@@ -1,16 +1,16 @@
 const showFallBack = () => {
-  const VIDEO_PATH = "hud/fallback-vid.mov";
+  const VIDEO_PATH = "/hud/fallback-vid.mov";
   const videoElem = document.createElement("video");
 
   videoElem.autoplay = true;
   videoElem.muted = true;
   videoElem.loop = true;
   videoElem.playsInline = true;
-  videoElem.controls = false;
+  videoElem.controls = true;
 
   const sourceVideoElem = document.createElement("source");
   sourceVideoElem.src = VIDEO_PATH;
-  sourceVideoElem.type = "video/mov";
+  sourceVideoElem.type = "video/mp4";
 
   videoElem.appendChild(sourceVideoElem);
 

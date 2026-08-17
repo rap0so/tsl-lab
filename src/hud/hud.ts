@@ -29,7 +29,7 @@ const categoryToY: Record<string, number> = {
 
     return setTimeout(() => {
       showFallBack();
-    }, 3000);
+    }, 2500);
   }
 
   printLine("WEBGPU BACKEND");
