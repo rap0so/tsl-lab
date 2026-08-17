@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://tsl-lab.vercel.app/</loc>
+  </url>
+  <url>
+    <loc>https://tsl-lab.vercel.app/hud</loc>
+  </url>
+  <url>
+    <loc>https://tsl-lab.vercel.app/ssr</loc>
+  </url>
+  <url>
+    <loc>https://tsl-lab.vercel.app/instancing</loc>
+  </url>
+  <url>
+    <loc>https://tsl-lab.vercel.app/texture</loc>
+  </url>
+  <url>
+    <loc>https://tsl-lab.vercel.app/postprocessing</loc>
+  </url>
+</urlset>
