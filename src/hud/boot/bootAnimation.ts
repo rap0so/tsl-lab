@@ -4,7 +4,10 @@ import printLine from "./printLine";
 
 const bootLoadingWrapper = document.getElementById("boot-loading")!;
 
-const bootSequence = () => {
+const bootSequence = (quick = false) => {
+  if (quick) {
+    return bootLoadingWrapper.remove();
+  }
   const tl = gsap.timeline();
 
   const steps = [

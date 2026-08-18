@@ -1,6 +1,6 @@
 import * as THREE from "three/webgpu";
 import labData from "./lab-network-data.json";
-import { addUpdateTask, renderer, scene } from "../utils/setup";
+import { addUpdateTask, camera, renderer, scene } from "../utils/setup";
 import normalizeMinMax from "./normalizeMinMax";
 import getMinMax from "./getMinMax";
 import getMatchingNodesTechnique from "./matchingNodesTechnique";
@@ -11,6 +11,7 @@ import nodesCreator from "./nodesCreator";
 import bootSequence from "./boot/bootAnimation";
 import printLine from "./boot/printLine";
 import showFallBack from "./boot/showFallBack";
+import getIntersected from "../utils/getIntersected";
 
 const SPREAD_X = 10;
 const SPREAD_Z = 6;
@@ -35,7 +36,7 @@ const categoryToY: Record<string, number> = {
   printLine("WEBGPU BACKEND");
   await renderer.init();
 
-  bootSequence();
+  bootSequence(true);
 
   const orders = labData.nodes.map((n) => n.order);
   const [minOrder, maxOrder] = getMinMax(orders);
@@ -94,7 +95,7 @@ const categoryToY: Record<string, number> = {
       const glow = Math.max(0, 1 - dist / 0.8); // 1 quando alinhado, 0 quando longe (>0.8)
 
       const base = mesh.userData.baseScale;
-      mesh.scale.setScalar(base * (1 + glow * 0.6));
+      mesh.scale.setScalar(base * (1 + glow * 0.04));
 
       const material = mesh.material as THREE.MeshBasicMaterial;
       material.color.copy(mesh.userData.baseColor);
@@ -109,9 +110,24 @@ const categoryToY: Record<string, number> = {
   /**
    * Now I need all the nodes that shares the same techniques at least 2x
    */
-
   const matchingNodeTechniques = getMatchingNodesTechnique(mappedNodes);
 
   // ----------------- NODES CONNECTOR -----------------
   linesConnectingNodes(matchingNodeTechniques);
+
+  //  ------------- Show details on cursor/touch -------------
+  const showDetails = (event: MouseEvent | TouchEvent) => {
+    const allCustomMeshes = Array.from(nodeMeshes.values());
+
+    const hit = getIntersected(event as PointerEvent, allCustomMeshes, camera);
+    if (hit) {
+      const legend = hit.children.find((child) => child.name === "legend-2D");
+      if (!legend) {
+        return;
+      }
+      legend.visible = !legend.visible;
+    }
+  };
+  window.addEventListener("touchend", showDetails);
+  window.addEventListener("click", showDetails);
 })();

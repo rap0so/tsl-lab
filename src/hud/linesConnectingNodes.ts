@@ -15,6 +15,7 @@ const linesConnectingNodes = (matchingNodeTechniques: MatchingNodeTech[]) => {
     const control = middle.add(new THREE.Vector3(0, height, 0));
     const radius = 0.01 * (matchNTech.matches || 1);
 
+    // TODO: add gsap here
     const curve = new THREE.QuadraticBezierCurve3(start, control, end);
 
     const mesh = new THREE.Mesh(
