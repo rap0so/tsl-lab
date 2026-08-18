@@ -12,6 +12,9 @@ import bootSequence from "./boot/bootAnimation";
 import printLine from "./boot/printLine";
 import showFallBack from "./boot/showFallBack";
 import getIntersected from "../utils/getIntersected";
+import isProd from "../utils/isProd";
+import parseNodeLegendToElement from "./parseNodeLegendToElement/parseNodeLegendToElement";
+import { CSS2DObject } from "three/examples/jsm/Addons.js";
 
 const SPREAD_X = 10;
 const SPREAD_Z = 6;
@@ -36,7 +39,7 @@ const categoryToY: Record<string, number> = {
   printLine("WEBGPU BACKEND");
   await renderer.init();
 
-  bootSequence();
+  bootSequence(!isProd());
 
   const orders = labData.nodes.map((n) => n.order);
   const [minOrder, maxOrder] = getMinMax(orders);
@@ -115,19 +118,27 @@ const categoryToY: Record<string, number> = {
   // ----------------- NODES CONNECTOR -----------------
   linesConnectingNodes(matchingNodeTechniques);
 
-  //  ------------- Show details on cursor/touch -------------
-  const showDetails = (event: MouseEvent | TouchEvent) => {
+  //  ------------- Show LEGEND details on cursor/touch -------------
+  const toggleLegend = (event: MouseEvent | TouchEvent) => {
     const allCustomMeshes = Array.from(nodeMeshes.values());
 
     const hit = getIntersected(event as PointerEvent, allCustomMeshes, camera);
     if (hit) {
       const legend = hit.children.find((child) => child.name === "legend-2D");
-      if (!legend) {
-        return;
+      if (legend) {
+        return hit.remove(legend);
       }
-      legend.visible = !legend.visible;
+
+      const legendData = hit.userData.legendData;
+      const hitScale = hit.userData.baseScale;
+      const legendElem = parseNodeLegendToElement(legendData);
+
+      const legendObject = new CSS2DObject(legendElem);
+      legendObject.name = "legend-2D";
+      legendObject.position.set(0, hitScale - 2.5, 0);
+      hit.add(legendObject);
     }
   };
-  window.addEventListener("touchend", showDetails);
-  window.addEventListener("click", showDetails);
+  window.addEventListener("touchend", toggleLegend);
+  window.addEventListener("click", toggleLegend);
 })();

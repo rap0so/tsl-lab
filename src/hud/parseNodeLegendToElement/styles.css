@@ -9,7 +9,7 @@
   background: #2c2c2c;
 }
 
-.title {
+.node-legend .title {
   font-size: 11px;
   color: #27a04d;
   text-shadow: 0 0 10px rgba(40, 252, 107, 0.511);
@@ -18,11 +18,15 @@
   text-transform: uppercase;
 }
 
-.technique {
+.node-legend .technique {
   list-style-type: none;
   font-size: 9px;
   margin: 0;
   padding: 0;
   color: #27a04d;
   text-shadow: 0 0 10px rgba(40, 252, 107, 0.511); /* glow */
+}
+
+.node-legend .technique.hide {
+  opacity: 0;
 }
