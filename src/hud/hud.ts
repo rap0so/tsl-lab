@@ -36,7 +36,7 @@ const categoryToY: Record<string, number> = {
   printLine("WEBGPU BACKEND");
   await renderer.init();
 
-  bootSequence(true);
+  bootSequence();
 
   const orders = labData.nodes.map((n) => n.order);
   const [minOrder, maxOrder] = getMinMax(orders);
