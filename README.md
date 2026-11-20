@@ -6,7 +6,9 @@ A daily-experiment sprint in **Three.js Shading Language (TSL) + WebGPU**: one s
 
 **Live:** https://tsl-lab.vercel.app · **Build log:** [@B1llCreator on X](https://x.com/B1llCreator)
 
-![HUD](public/hud-og.png)
+![HUD: a network map of every experiment in the lab](docs/hud-preview.gif)
+
+<sub>[Full-quality video](public/hud/fallback-vid.mp4) (28s)</sub>
 
 ## Experiments
 
