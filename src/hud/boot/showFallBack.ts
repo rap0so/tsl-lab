@@ -1,5 +1,5 @@
 const showFallBack = () => {
-  const VIDEO_PATH = "/hud/fallback-vid.mov";
+  const VIDEO_PATH = "/hud/fallback-vid.mp4";
   const videoElem = document.createElement("video");
 
   videoElem.autoplay = true;
